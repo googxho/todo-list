@@ -1,6 +1,6 @@
 ### 项目说明
 
-<img src="/public/todo/assets/tudo.png" alt="" srcset="">
+![](/public/todo/assets/tudo.png)
 
 ### 项目使用
 
