@@ -9,6 +9,16 @@ const todoRouter = express.Router();
 // 导入todo集合构造函数
 const Task = require('../model/task');
 
+// 当页面中有ajax请求发送时触发
+$(document).on('ajaxStart', function () {
+	NProgress.start()
+})
+
+// 当页面中有ajax请求完成时触发
+$(document).on('ajaxComplete', function () {
+	NProgress.done()
+})
+
 // 获取任务列表
 todoRouter.get('/task', async (req, res) => {
 	const task = await Task.find();
@@ -29,16 +39,14 @@ todoRouter.post('/addTask', async (req, res) => {
 	// 验证失败
 	if (error) {
 		// 将错误信息响应给客户端
-		return res.status(400).send({message: error.details[0].message})
+		return res.status(400).send({ message: error.details[0].message })
 	}
 	// 创建任务实例
-	const task = new Task({title: title, completed: false});
+	const task = new Task({ title: title, completed: false });
 	// 执行插入操作
 	await task.save();
 	// 响应
-	setTimeout(() => {
-		res.send(task);
-	}, 2000)
+	res.send(task);
 });
 
 // 删除任务
@@ -54,10 +62,10 @@ todoRouter.get('/deleteTask', async (req, res) => {
 	// 验证失败
 	if (error) {
 		// 将错误信息响应给客户端
-		return res.status(400).send({message: error.details[0].message})
+		return res.status(400).send({ message: error.details[0].message })
 	}
 	// 删除任务
-	const task = await Task.findOneAndDelete({_id: _id});
+	const task = await Task.findOneAndDelete({ _id: _id });
 	// 响应
 	res.send(task);
 });
@@ -65,7 +73,7 @@ todoRouter.get('/deleteTask', async (req, res) => {
 // 清除已完成任务
 todoRouter.get('/clearTask', async (req, res) => {
 	// 执行清空操作
-	await Task.deleteMany({completed: true});
+	await Task.deleteMany({ completed: true });
 	const task = await Task.find();
 	// 响应
 	res.send(task);
@@ -74,7 +82,7 @@ todoRouter.get('/clearTask', async (req, res) => {
 // 修改任务
 todoRouter.post('/modifyTask', async (req, res) => {
 	// 执行修改操作
-	const task = await Task.findOneAndUpdate({_id: req.body._id}, _.pick(req.body, ['title', 'completed']),{new: true})
+	const task = await Task.findOneAndUpdate({ _id: req.body._id }, _.pick(req.body, ['title', 'completed']), { new: true })
 	// 响应
 	res.send(task);
 });
@@ -82,9 +90,9 @@ todoRouter.post('/modifyTask', async (req, res) => {
 // 查询未完成任务数量
 todoRouter.get('/unCompletedTaskCount', async (req, res) => {
 	// 执行查询操作
-	const result = await Task.countDocuments({completed: false});
+	const result = await Task.countDocuments({ completed: false });
 	// 响应
-	res.send({num: result})
+	res.send({ num: result })
 });
 
 // 更改任务全部状态
@@ -92,7 +100,7 @@ todoRouter.get('/changeAllTasksComplete', async (req, res) => {
 	// 状态
 	const { status } = req.query;
 	// 执行更改状态操作
-	const result = await Task.updateMany({}, {completed: status});
+	const result = await Task.updateMany({}, { completed: status });
 	// 响应
 	res.send(result);
 });
